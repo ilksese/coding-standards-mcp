@@ -17,4 +17,5 @@
      ```
 
 - Don't optimize code too early.
+- Do not overengineer or proactively expand security boundaries before a real problem is encountered or a user reports a vulnerability.
 - When implementing a feature, prefer a library already in the project, or a suitable third-party library, over a custom implementation. Building it yourself is too costly unless no suitable library exists.
