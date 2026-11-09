@@ -1,4 +1,4 @@
-# spammer-web Coding Standards
+# Project-Level Coding Standards (Take Precedence over Global Coding Standards)
 
 ## Internationalization
 

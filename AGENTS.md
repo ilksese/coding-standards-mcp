@@ -16,6 +16,7 @@
 
 ## Change traps
 
+- Keep `standards/projects/chogath-web.md`, `standards/projects/smolder-web.md`, `standards/projects/kassadin-web.md`, and `standards/projects/ksante-web.md` byte-for-byte identical, including headings, whitespace, and final newlines. Any edit to one requires updating the other three in the same change. Use a shared, project-neutral heading and verify all four files are byte-for-byte identical before completing the task.
 - MCP server metadata, instructions, tool descriptions, and schema text in `src/server.ts` must remain English; tests reject Han characters there.
 - `get_coding_standards` intentionally has one required argument, `projectName`. Keep exact, case-sensitive matching and do not restore `lang` or legacy directory fallback.
 - The stdio integration test reads the real `standards/` files and asserts selected rule text; run the full suite after changing standards, not only loader unit tests.
