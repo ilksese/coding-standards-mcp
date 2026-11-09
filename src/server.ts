@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod/v4";
-import { getCodingStandards } from "./standards.ts";
+import { getCodingStandards, listSupportedProjects } from "./standards.ts";
 
 /** 创建仅提供代码规范查询工具的 MCP 服务器，不启动传输连接。 */
 export function createServer(standardsDirectory?: string): McpServer {
@@ -17,6 +17,7 @@ export function createServer(standardsDirectory?: string): McpServer {
         "Before creating or modifying project code, call get_coding_standards for the target project and apply the returned standards.",
         "Also use it before code reviews to check the project's conventions. This includes component organization, internationalization, comments, and maintainability rules.",
         "Use the exact project name. The project name identifies the code being worked on, not this MCP server. Standards are maintained in English; there is no language parameter or automatic translation.",
+        "Call list_supported_projects to discover exact registered project names.",
         "Explicit project overrides take precedence over the corresponding common rules; all other common rules remain applicable.",
         "Empty text means the project is not registered, not that common standards were loaded; do not invent project rules or retry guessed aliases.",
         "If the tool fails, report the failure and do not modify project code until the failure is resolved."
@@ -58,6 +59,34 @@ export function createServer(standardsDirectory?: string): McpServer {
         return {
           isError: true,
           content: [{ type: "text", text: `读取代码规范失败：${message}` }]
+        };
+      }
+    }
+  );
+
+  server.registerTool(
+    "list_supported_projects",
+    {
+      title: "List Supported Projects",
+      description:
+        "Return a sorted JSON array of supported project names for get_coding_standards. No arguments required.",
+      inputSchema: {},
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false
+      }
+    },
+    async () => {
+      try {
+        const projects = await listSupportedProjects(standardsDirectory);
+        return { content: [{ type: "text", text: JSON.stringify(projects) }] };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return {
+          isError: true,
+          content: [{ type: "text", text: `Failed to list supported projects: ${message}` }]
         };
       }
     }

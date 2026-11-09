@@ -32,7 +32,7 @@ pnpm install --frozen-lockfile
 
 ## 查询代码规范
 
-服务仅提供 `get_coding_standards` 工具，参数如下：
+使用 `get_coding_standards` 工具查询规范，参数如下：
 
 ```json
 { "projectName": "your-project" }
@@ -45,6 +45,18 @@ pnpm install --frozen-lockfile
 查询未登记项目时，工具返回空文本；读取规范失败时，工具返回错误结果。
 
 规范文档统一以英文维护。
+
+## 获取支持的项目列表
+
+调用无参数工具 `list_supported_projects`，返回按名称排序的 JSON 数组，例如：
+
+```json
+["example-project", "your-project"]
+```
+
+项目名称不包含 `.md` 后缀，可直接用于 `get_coding_standards` 的 `projectName` 参数。
+列表每次调用时实时读取，仅包含项目目录下的 `.md` 普通文件，不包含子目录或符号链接。
+没有项目时返回 `[]`；目录读取失败时返回工具错误。
 
 ## 更多文档
 
