@@ -1,4 +1,4 @@
-# Coding Standards
+# Global Coding Standards
 
 - The new component must include JSDoc description comments to explain the component's purpose.
 - Long processes must have clear comments at the decision nodes.
@@ -16,6 +16,35 @@
      // Track: <Related Ticket or discussion link>
      ```
 
-- Don't optimize code too early.
-- Do not overengineer or proactively expand security boundaries before a real problem is encountered or a user reports a vulnerability.
 - When implementing a feature, prefer a library already in the project, or a suitable third-party library, over a custom implementation. Building it yourself is too costly unless no suitable library exists.
+
+## Think Before Coding
+
+- State assumptions explicitly. If requirements are ambiguous or multiple interpretations would lead to different implementations, ask for clarification instead of silently choosing one.
+- Read the relevant existing code before making changes. Surface tradeoffs and simpler alternatives; do not hide uncertainty or make consequential decisions on the user's behalf.
+
+## Simplicity First
+
+- Write the smallest amount of code that fully solves the requested problem. Do not add speculative features, abstractions, configuration, or flexibility for hypothetical future needs.
+- Don't optimize code too early. Do not overengineer or proactively expand security boundaries before a real problem is encountered or a user reports a vulnerability. Preserve existing security safeguards and required validation.
+
+## Surgical Changes
+
+- Change only what the task requires. Do not refactor unrelated code, reformat surrounding files, or fix unrelated issues without permission.
+- Match the existing style and conventions. Remove imports, variables, or helpers made unused by your own changes, but leave unrelated pre-existing cleanup for a separate task.
+
+## Goal-Driven Execution
+
+- Translate the request into observable success criteria before implementing it. For multi-step work, pair each step with a concrete verification check.
+- Verify behavior rather than assuming that a code change is sufficient. For bug fixes, reproduce the failure and verify the fix; for other changes, run the relevant tests or checks.
+- Report what was verified, what could not be checked, and any remaining limitations. Do not claim success beyond the available evidence.
+
+## Image Data Mocking
+
+- Use [Placehold](https://placehold.co/) for mock image URLs when real assets are unavailable. Match the intended image dimensions and aspect ratio.
+- Specify dimensions as `https://placehold.co/600x400`; a single value such as `/400` creates a square. Supported dimensions range from 10 to 4000 pixels per side.
+- The default format is SVG. Specify `.png`, `.jpeg`, `.gif`, `.webp`, or `.avif` when a raster format is needed, for example `https://placehold.co/600x400.png`.
+- Set background and text colors together using hex values or CSS color names: `https://placehold.co/600x400/eeeeee/333333.png`. Use `transparent` for a transparent background.
+- Add descriptive text with `?text=Product+Image`; encode spaces as `+` and line breaks as `%5Cn`. Without custom text, the image displays its dimensions. An optional `font` query parameter selects a supported font; the default is Lato.
+- For high-density raster images, append `@2x` or `@3x` to the size before the extension, for example `https://placehold.co/600x400@2x.png?text=Product+Image`. Retina variants are not supported for SVG.
+- In Next.js projects using `next/image`, add `{ protocol: "https", hostname: "placehold.co", port: "", pathname: "/**" }` to `images.remotePatterns` in the existing `next.config.*` configuration, preserving other entries. Omit `search` to allow mock URLs with query parameters such as `text` and `font`; `search: ""` blocks them. Prefer a raster format such as `.png` rather than enabling SVG optimization for placeholders.
