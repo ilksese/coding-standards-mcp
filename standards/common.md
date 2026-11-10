@@ -33,6 +33,12 @@
 - Change only what the task requires. Do not refactor unrelated code, reformat surrounding files, or fix unrelated issues without permission.
 - Match the existing style and conventions. Remove imports, variables, or helpers made unused by your own changes, but leave unrelated pre-existing cleanup for a separate task.
 
+## Git
+
+- When preparing a `git commit`, exclude test files and Markdown files by default; keep new files of these types untracked. Include them only if they were both already tracked by Git and already staged before preparing the commit. Do not stage them just to satisfy these conditions.
+- Never commit log files to Git. Keep them untracked.
+- Do not run `git push` unless the user has explicitly approved the push.
+
 ## Documentation Sync
 
 - Whenever the codebase changes, immediately trace and update all affected documentation that describes or references the changed code, including `AGENTS.md`, README files, and linked documents. Complete these updates in the same change before reporting the work done.
