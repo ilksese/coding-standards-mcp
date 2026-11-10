@@ -33,6 +33,12 @@
 - Change only what the task requires. Do not refactor unrelated code, reformat surrounding files, or fix unrelated issues without permission.
 - Match the existing style and conventions. Remove imports, variables, or helpers made unused by your own changes, but leave unrelated pre-existing cleanup for a separate task.
 
+## Documentation Sync
+
+- Whenever the codebase changes, immediately trace and update all affected documentation that describes or references the changed code, including `AGENTS.md`, README files, and linked documents. Complete these updates in the same change before reporting the work done.
+- Describe the latest implemented codebase in the present tense. Replace or remove stale descriptions, paths, and references instead of appending correction notes.
+- Documentation must not retain or introduce obsolete logic, migration narratives, or intermediate implementation states. Keep descriptions consistent across documents and verify referenced paths and symbols against the current code.
+
 ## Goal-Driven Execution
 
 - Translate the request into observable success criteria before implementing it. For multi-step work, pair each step with a concrete verification check.
