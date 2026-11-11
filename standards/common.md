@@ -47,6 +47,7 @@
 
 ## Goal-Driven Execution
 
+- When the user says only “收尾”, perform requirement closeout: verify acceptance criteria and ticket completion, synchronize maintained documentation, review whether ADRs remain valid, archive completed local specs and tickets, and repair affected references. Retain valid ADRs and keep specs and plans out of Git.
 - Translate the request into observable success criteria before implementing it. For multi-step work, pair each step with a concrete verification check.
 - Verify behavior rather than assuming that a code change is sufficient. For bug fixes, reproduce the failure and verify the fix; for other changes, run the relevant tests or checks.
 - Report what was verified, what could not be checked, and any remaining limitations. Do not claim success beyond the available evidence.
