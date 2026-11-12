@@ -19,6 +19,16 @@
 
 - Changes outside the task scope caused by code formatting tools do not need to be reverted.
 
+## Pull Request Prerequisites
+
+- Before creating any pull request (PR), pause the PR creation workflow and ask the developer to manually check that the version number is correct and whether the static branch needs to be synchronized.
+- Resume the PR creation workflow only after the developer explicitly replies `继续` ("continue"). Until then, remain paused and do not create the PR.
+
+## Cross-Repository Access
+
+- Treat repositories other than the current task's repository as read-only by default.
+- Cross-repository writes require the user's explicit prior permission. If permission has not been granted, pause and ask the user before writing to another repository.
+
 ## Device-Specific Routing
 
 - Next.js server middleware inspects the client's `User-Agent` request header and automatically serves mobile or desktop HTML. Use request URLs without `/m` or `/pc` route segments.
