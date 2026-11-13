@@ -35,7 +35,7 @@
 
 ## Git
 
-- When preparing a `git commit`, exclude test files and Markdown files by default; keep new files of these types untracked. Include them only if they were both already tracked by Git and already staged before preparing the commit. Do not stage them just to satisfy these conditions.
+- When preparing a `git commit`, exclude test files and Markdown files other than `README.md` by default; keep new files of these types untracked. Include them only if they were both already tracked by Git and already staged before preparing the commit. Do not stage them just to satisfy these conditions. Files named exactly `README.md` are exempt from this exclusion and may be staged and committed normally.
 - Never commit log files to Git. Keep them untracked.
 - Do not run `git push` unless the user has explicitly approved the push.
 
