@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const defaultStandardsDirectory = fileURLToPath(new URL("../standards/", import.meta.url));
 
 /** 实时列出有规范文件的项目，忽略目录、符号链接和空项目名。 */
-export async function listSupportedProjects(standardsDirectory = defaultStandardsDirectory): Promise<string[]> {
+async function listSupportedProjects(standardsDirectory: string): Promise<string[]> {
   const entries = await readdir(join(standardsDirectory, "projects"), { withFileTypes: true });
   return entries
     .filter((entry) => entry.isFile() && entry.name.endsWith(".md") && entry.name.length > 3)
@@ -25,9 +25,9 @@ export async function getCodingStandards(
   // 每次重新登记并读取，使新增、删除及内容修改都无需重启即可生效。
   const project = projects.includes(projectName);
 
-  // 未匹配不读取公共规范，确保不会退回只有公共规范的不完整结果。
+  // 未匹配项目时仅返回公共规范原文，不把输入作为文件路径。
   if (!project) {
-    return "";
+    return readFile(join(standardsDirectory, "common.md"), "utf8");
   }
 
   const [common, projectStandards] = await Promise.all([
