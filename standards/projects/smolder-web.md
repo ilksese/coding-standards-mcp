@@ -21,11 +21,14 @@
 
 ## Pull Request Prerequisites
 
-- Before creating any pull request (PR), pause the PR creation workflow and ask the developer to manually check that the version number is correct and whether the static branch needs to be synchronized.
-- Resume the PR creation workflow only after the developer explicitly replies `继续` ("continue"). Until then, remain paused and do not create the PR.
-- After resuming, run `zsh -lic 'ci lint'` for code checks before creating the PR. Create the PR only when the check reports no problems.
-- If the check reports problems, fix them and re-run the check until it passes; do not create the PR until then.
+- Running the lint check is the first step of the pull request (PR) flow, before any other PR step: run `zsh -lic 'ci lint --base <ref>'`.
+- `--base <ref>` is an optional argument of the lint command, but the PR flow requires it by default: ask the developer which base ref to compare against before running the check. Skip asking only when the developer has already specified the base ref earlier in the same task, and reuse that value.
+- If the check reports problems, fix them and re-run the check until it passes; do not continue the PR flow until then.
+- Code review is mandatory for the fixed code: review every change produced by lint auto-fix or by manual fixes before continuing the PR flow, and confirm each change stays within lint, formatting, and type-safety scope without breaking the task's acceptance goal (requested behavior, delivered features, and already verified acceptance criteria).
+- If a fix goes beyond formatting or risks breaking the acceptance goal, revert that change and replace it with the minimal change that keeps the acceptance goal intact, then re-run the lint check.
 - Only an explicit developer reply of `强制提交` ("force submit") bypasses this lint gate for the current PR.
+- After the lint check reports no problems, pause the PR creation workflow and ask the developer to manually check that the version number is correct and whether the static branch needs to be synchronized.
+- Resume the PR creation workflow only after the developer explicitly replies `继续` ("continue"). Until then, remain paused and do not create the PR.
 
 ## Cross-Repository Access
 
