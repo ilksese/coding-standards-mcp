@@ -23,6 +23,9 @@
 
 - Before creating any pull request (PR), pause the PR creation workflow and ask the developer to manually check that the version number is correct and whether the static branch needs to be synchronized.
 - Resume the PR creation workflow only after the developer explicitly replies `继续` ("continue"). Until then, remain paused and do not create the PR.
+- After resuming, run `zsh -lic 'ci lint'` for code checks before creating the PR. Create the PR only when the check reports no problems.
+- If the check reports problems, fix them and re-run the check until it passes; do not create the PR until then.
+- Only an explicit developer reply of `强制提交` ("force submit") bypasses this lint gate for the current PR.
 
 ## Cross-Repository Access
 
