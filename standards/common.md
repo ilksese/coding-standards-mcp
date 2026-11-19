@@ -37,13 +37,16 @@
 
 ## Git
 
-- When preparing a `git commit`, exclude test files and Markdown files other than `README.md` by default; keep new files of these types untracked. Include them only if they were both already tracked by Git and already staged before preparing the commit. Do not stage them just to satisfy these conditions. Files named exactly `README.md` are exempt from this exclusion and may be staged and committed normally.
+- When preparing a `git commit`, exclude test files and Markdown files by default; keep new files of these types untracked. Include them only if they were both already tracked by Git and already staged before preparing the commit. Do not stage them just to satisfy these conditions. Files named exactly `README.md` or `AGENTS.md`, and Markdown files under a `docs/` directory (including nested subdirectories), are exempt from the Markdown exclusion and may be staged and committed normally, subject to the `AGENTS.md` section rule below.
+- When committing `AGENTS.md`, exclude the entire `## Agent skills` section, including its heading and all content up to the next level-one or level-two heading or the end of the file. Keep this section in the working-tree file; omit it from the staged version, even if it was already staged. Other sections may be committed normally.
 - Never commit log files to Git. Keep them untracked.
 - Do not run `git push` unless the user has explicitly approved the push.
 
 ## Documentation Sync
 
-- Whenever the codebase changes, immediately trace and update all affected documentation that describes or references the changed code, including `AGENTS.md`, README files, and linked documents. Complete these updates in the same change before reporting the work done.
+- Sync documentation on demand. Update it only when your change makes an existing description, example, or link inaccurate, or when it changes how users or maintainers must operate the project. Update only the directly related passages, within the same change.
+- Leave Markdown untouched for internal refactoring, equivalent syntax rewrites, and tool configuration changes that do not alter how the project is used.
+- Record only long-term conventions in `AGENTS.md` that code, configuration, or automated checks cannot express adequately. Do not restate existing lint rules, configuration values, or implementation details there.
 - Describe the latest implemented codebase in the present tense. Replace or remove stale descriptions, paths, and references instead of appending correction notes.
 - Documentation must not retain or introduce obsolete logic, migration narratives, or intermediate implementation states. Keep descriptions consistent across documents and verify referenced paths and symbols against the current code.
 

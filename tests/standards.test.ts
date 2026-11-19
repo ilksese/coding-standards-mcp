@@ -32,15 +32,15 @@ test("未知名称、大小写差异、额外空白、空名称和路径均不�
     "..\\common",
     "alpha\0"
   ]) {
-    assert.equal(await getCodingStandards(name, directory), "", name);
+    assert.equal(await getCodingStandards(name, directory), "Common original\nKeep whitespace.\n", name);
   }
 });
 
-test("未知项目在公共规范缺失时仍返回空字符串，而不是读取公共规范", async (t) => {
+test("未知项目和已登记项目在公共规范缺失时均报错", async (t) => {
   const { directory } = await createFixture(t);
   await rm(join(directory, "common.md"));
 
-  assert.equal(await getCodingStandards("unknown", directory), "");
+  await assert.rejects(getCodingStandards("unknown", directory), { code: "ENOENT" });
   await assert.rejects(getCodingStandards("alpha", directory), {
     code: "ENOENT"
   });
@@ -57,11 +57,11 @@ test("实时读取公共和项目文档，新增或删除项目无需重启", as
   assert.ok(updated.includes("更新后的公共规范"));
   assert.ok(updated.includes("更新后的项目规范"));
 
-  assert.equal(await getCodingStandards("beta", directory), "");
+  assert.equal(await getCodingStandards("beta", directory), "更新后的公共规范");
   await writeFile(join(projectsDirectory, "beta.md"), "新项目规范");
   assert.ok((await getCodingStandards("beta", directory)).includes("新项目规范"));
   await rm(join(projectsDirectory, "beta.md"));
-  assert.equal(await getCodingStandards("beta", directory), "");
+  assert.equal(await getCodingStandards("beta", directory), "更新后的公共规范");
 });
 
 test("只有 .md 普通文件登记为项目，忽略目录、其他扩展名与符号链接", async (t) => {
@@ -71,7 +71,7 @@ test("只有 .md 普通文件登记为项目，忽略目录、其他扩展名与
   await symlink(join(directory, "common.md"), join(projectsDirectory, "link.md"));
 
   for (const name of ["folder", "other", "link"]) {
-    assert.equal(await getCodingStandards(name, directory), "");
+    assert.equal(await getCodingStandards(name, directory), "Common original\nKeep whitespace.\n");
   }
 });
 
@@ -131,7 +131,7 @@ test("只读取简化目录，不登记旧语言目录中的项目，也不回�
   }
 
   assert.equal(await getCodingStandards("alpha", directory), original);
-  assert.equal(await getCodingStandards("legacy", directory), "");
+  assert.equal(await getCodingStandards("legacy", directory), "Common original\nKeep whitespace.\n");
   await rm(join(directory, "common.md"));
   await assert.rejects(getCodingStandards("alpha", directory), { code: "ENOENT" });
 });

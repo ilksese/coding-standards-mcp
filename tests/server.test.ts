@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, rm, symlink, writeFile } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { test, type TestContext } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -7,7 +7,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createServer } from "../src/server.ts";
-import { getCodingStandards, listSupportedProjects } from "../src/standards.ts";
+import { getCodingStandards } from "../src/standards.ts";
 import { createFixture } from "./helpers.ts";
 
 /** 使用真实 MCP 客户端与内存传输验证工具协议，不绕过参数校验。 */
@@ -37,7 +37,8 @@ test("初始化元数据和工具说明使用英文，并明确编码前查询�
   assert.match(instructions ?? "", /If the tool fails.*do not modify project code/);
   assert.equal(tool?.title, "Load Project Coding Standards Before Coding");
   assert.match(tool?.description ?? "", /Call before writing or editing code/);
-  assert.match(tool?.description ?? "", /Unregistered projects return an empty string, not common standards/);
+  assert.match(tool?.description ?? "", /Unregistered projects return only the full common standards/);
+  assert.match(instructions ?? "", /Unregistered projects receive only the full common standards/);
   assert.match(tool?.description ?? "", /Returns English standards without language selection/);
   assert.doesNotMatch(instructions ?? "", /lang:|fall.?back/i);
   assert.doesNotMatch(tool?.description ?? "", /lang defaults|fall.?back/i);
@@ -53,12 +54,12 @@ test("初始化元数据和工具说明使用英文，并明确编码前查询�
   );
 });
 
-test("暴露规范查询和项目列表工具，规范查询仍只要求 projectName", async (t) => {
+test("仅暴露规范查询工具，只要求 projectName", async (t) => {
   const { directory } = await createFixture(t);
   const client = await connectClient(t, directory);
   const { tools } = await client.listTools();
 
-  assert.equal(tools.length, 2);
+  assert.equal(tools.length, 1);
   assert.equal(tools[0]?.name, "get_coding_standards");
   assert.deepEqual(tools[0]?.inputSchema.required, ["projectName"]);
   const projectSchema = tools[0]?.inputSchema.properties?.projectName;
@@ -66,13 +67,9 @@ test("暴露规范查询和项目列表工具，规范查询仍只要求 project
   assert.equal(projectSchema.type, "string");
   assert.deepEqual(Object.keys(tools[0]?.inputSchema.properties ?? {}), ["projectName"]);
   assert.equal(tools[0]?.annotations?.readOnlyHint, true);
-  assert.equal(tools[1]?.name, "list_supported_projects");
-  assert.deepEqual(tools[1]?.inputSchema.properties, {});
-  assert.equal(tools[1]?.annotations?.readOnlyHint, true);
-  assert.doesNotMatch(JSON.stringify(tools[1]), /\p{Script=Han}/u);
 });
 
-test("MCP 工具返回组合文本，未匹配时返回精确的空字符串", async (t) => {
+test("MCP 工具返回组合文本，未匹配时返回公共规范原文", async (t) => {
   const { directory } = await createFixture(t);
   const client = await connectClient(t, directory);
   const result = await client.callTool({
@@ -88,7 +85,7 @@ test("MCP 工具返回组合文本，未匹配时返回精确的空字符串", a
     arguments: { projectName: "unknown" }
   });
   assert.notEqual(missing.isError, true);
-  assert.deepEqual(missing.content, [{ type: "text", text: "" }]);
+  assert.deepEqual(missing.content, [{ type: "text", text: "Common original\nKeep whitespace.\n" }]);
 });
 
 test("缺少参数或参数类型错误由 MCP 参数校验拒绝", async (t) => {
@@ -120,8 +117,8 @@ test("读取故障返回 isError，不返回空字符串，服务器可继续处
     name: "get_coding_standards",
     arguments: { projectName: "unknown" }
   });
-  assert.notEqual(missing.isError, true);
-  assert.deepEqual(missing.content, [{ type: "text", text: "" }]);
+  assert.equal(missing.isError, true);
+  assert.match(JSON.stringify(missing.content), /读取代码规范失败.*ENOENT/);
 
   await writeFile(join(directory, "common.md"), "Restored common standards");
   const restored = await client.callTool({
@@ -186,13 +183,9 @@ for (const launch of [
     const { tools } = await client.listTools();
     assert.deepEqual(
       tools.map((tool) => tool.name),
-      ["get_coding_standards", "list_supported_projects"]
+      ["get_coding_standards"]
     );
     assert.deepEqual(Object.keys(tools[0]?.inputSchema.properties ?? {}), ["projectName"]);
-
-    const projects = await client.callTool({ name: "list_supported_projects" });
-    assert.notEqual(projects.isError, true);
-    assert.deepEqual(projects.content, [{ type: "text", text: JSON.stringify(await listSupportedProjects()) }]);
 
     const result = await client.callTool({
       name: "get_coding_standards",
@@ -209,41 +202,10 @@ for (const launch of [
       name: "get_coding_standards",
       arguments: { projectName: "not-registered" }
     });
-    assert.deepEqual(missing.content, [{ type: "text", text: "" }]);
+    assert.notEqual(missing.isError, true);
+    assert.deepEqual(missing.content, [
+      { type: "text", text: await readFile(new URL("../standards/common.md", import.meta.url), "utf8") }
+    ]);
     assert.equal(stderr, "");
   });
 }
-
-test("项目列表实时排序，仅登记普通 Markdown 文件，且不读取规范正文", async (t) => {
-  const { directory, projectsDirectory } = await createFixture(t);
-  const client = await connectClient(t, directory);
-  await writeFile(join(projectsDirectory, "zeta.md"), "Zeta");
-  await writeFile(join(projectsDirectory, "Beta.md"), "Beta");
-  await writeFile(join(projectsDirectory, ".md"), "Empty name");
-  await writeFile(join(projectsDirectory, "ignored.txt"), "Ignored");
-  await mkdir(join(projectsDirectory, "nested.md"));
-  await writeFile(join(projectsDirectory, "nested.md", "hidden.md"), "Nested");
-  await symlink(join(projectsDirectory, "alpha.md"), join(projectsDirectory, "linked.md"));
-  await rm(join(directory, "common.md"));
-
-  const result = await client.callTool({ name: "list_supported_projects" });
-  assert.notEqual(result.isError, true);
-  assert.deepEqual(result.content, [{ type: "text", text: '["Beta","alpha","zeta"]' }]);
-
-  await rm(projectsDirectory, { recursive: true });
-  await mkdir(projectsDirectory);
-  const empty = await client.callTool({ name: "list_supported_projects", arguments: {} });
-  assert.notEqual(empty.isError, true);
-  assert.deepEqual(empty.content, [{ type: "text", text: "[]" }]);
-
-  await rm(projectsDirectory, { recursive: true });
-  const failed = await client.callTool({ name: "list_supported_projects" });
-  assert.equal(failed.isError, true);
-  assert.match(JSON.stringify(failed.content), /Failed to list supported projects.*ENOENT/);
-
-  await mkdir(projectsDirectory);
-  await writeFile(join(projectsDirectory, "restored.md"), "Restored");
-  const restored = await client.callTool({ name: "list_supported_projects" });
-  assert.notEqual(restored.isError, true);
-  assert.deepEqual(restored.content, [{ type: "text", text: '["restored"]' }]);
-});

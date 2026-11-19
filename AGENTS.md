@@ -9,8 +9,8 @@
 
 ## Standards behavior
 
-- Standards are English Markdown runtime data: `standards/common.md` plus a direct regular file at `standards/projects/<exact-project-name>.md`. There is no registry, language directory, fallback, recursive discovery, or symlink support.
-- Every query re-reads the directory and both documents. An unknown project returns `""` without reading the common document; a registered project's read failure becomes an MCP tool error.
+- Standards are English Markdown runtime data: `standards/common.md` plus a direct regular file at `standards/projects/<exact-project-name>.md`. There is no registry, language directory, recursive discovery, or symlink support.
+- Every query re-reads the directory and applicable documents. An unknown project returns the common document verbatim; any required document's read failure becomes an MCP tool error.
 - Preserve both documents verbatim in the response. Project overrides are instructions for the consumer; the server does not parse, merge, or resolve conflicting rules.
 - Keep `README.md` user-facing: use placeholder project names and never list or demonstrate a real registered project name.
 
