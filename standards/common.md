@@ -2,6 +2,8 @@
 
 - The new component must include JSDoc description comments to explain the component's purpose.
 - Long processes must have clear comments at the decision nodes.
+- Do not write comments that merely restate simple, obvious code. Delete comments that only narrate what the next line already says.
+- Keep comments that explain why, non-obvious behavior, protocol or external constraints, and `[HACK]` notes.
 - Any code utilizing hacks, workarounds, or non-intuitive logic must be thoroughly commented. The comments should explicitly state:
 
   1. The ‌rationale‌ behind choosing this approach over standard methods.
