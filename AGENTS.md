@@ -16,7 +16,7 @@
 
 ## Change traps
 
-- Keep `standards/projects/chogath-web.md`, `standards/projects/smolder-web.md`, `standards/projects/kassadin-web.md`, and `standards/projects/ksante-web.md` byte-for-byte identical, including headings, whitespace, and final newlines. Any edit to one requires updating the other three in the same change. Use a shared, project-neutral heading and verify all four files are byte-for-byte identical before completing the task.
+- Shared rules for `kassadin-web`, `chogath-web`, `ksante-web`, and `smolder-web` live only in `standards/projects/seamaid-web.md`. That file is a required family layer, not a queryable project. A member project file is optional and holds only that project's overrides. Adding a project to the family requires an explicit edit to the fixed member list in `src/standards.ts`.
 - MCP server metadata, instructions, tool descriptions, and schema text in `src/server.ts` must remain English; tests reject Han characters there.
 - `get_coding_standards` intentionally has one required argument, `projectName`. Keep exact, case-sensitive matching and do not restore `lang` or legacy directory fallback.
 - The stdio integration test reads the real `standards/` files and asserts selected rule text; run the full suite after changing standards, not only loader unit tests.

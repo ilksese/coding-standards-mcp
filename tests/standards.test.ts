@@ -135,3 +135,34 @@ test("只读取简化目录，不登记旧语言目录中的项目，也不回�
   await rm(join(directory, "common.md"));
   await assert.rejects(getCodingStandards("alpha", directory), { code: "ENOENT" });
 });
+
+test("四个家族成员插入 seamaid-web，项目文件可选，其他项目不继承", async (t) => {
+  const { directory, projectsDirectory } = await createFixture(t);
+  await writeFile(join(projectsDirectory, "seamaid-web.md"), "Family original\n");
+  await writeFile(join(projectsDirectory, "chogath-web.md"), "Chogath override\n");
+
+  assert.equal(
+    await getCodingStandards("chogath-web", directory),
+    ["# chogath-web", "Common original\nKeep whitespace.\n", "---", "Family original\n", "---", "Chogath override\n"].join(
+      "\n\n"
+    )
+  );
+  assert.equal(
+    await getCodingStandards("kassadin-web", directory),
+    ["# kassadin-web", "Common original\nKeep whitespace.\n", "---", "Family original\n"].join("\n\n")
+  );
+  assert.equal(await getCodingStandards("seamaid-web", directory), "Common original\nKeep whitespace.\n");
+  assert.equal(
+    await getCodingStandards("alpha", directory),
+    ["# alpha", "Common original\nKeep whitespace.\n", "---", "Project original\nExplicit overrides.\n"].join("\n\n")
+  );
+  assert.equal(await getCodingStandards("spammer-web", directory), "Common original\nKeep whitespace.\n");
+});
+
+test("家族层缺失或是符号链接时报错，不退回公共规范", async (t) => {
+  const { directory, projectsDirectory } = await createFixture(t);
+  await assert.rejects(getCodingStandards("ksante-web", directory), { code: "ENOENT" });
+
+  await symlink(join(directory, "common.md"), join(projectsDirectory, "seamaid-web.md"));
+  await assert.rejects(getCodingStandards("smolder-web", directory), { code: "ENOENT" });
+});

@@ -1,4 +1,4 @@
-# Project-Level Coding Standards (Take Precedence over Global Coding Standards)
+# Seamaid Web Family Standards (Between Global and Project Standards)
 
 ## UI Copy Precedence
 
