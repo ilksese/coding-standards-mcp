@@ -56,6 +56,14 @@
 - As part of closeout, delete every file and folder the task created in the system's temporary directories to free disk space. Resolve the location per platform: `TMPDIR`/`/tmp` (Linux and macOS), `%TEMP%`/`%TMP%` (Windows), or the harness-assigned session temp directory. Only remove artifacts this task created; never delete temp files owned by other sessions or processes.
 - Translate the request into observable success criteria before implementing it. For multi-step work, pair each step with a concrete verification check.
 - Verify behavior rather than assuming that a code change is sufficient. For bug fixes, reproduce the failure and verify the fix; for other changes, run the relevant tests or checks.
+
+### User-Triggerability Gate
+
+- A code review finding must identify a concrete user-accessible entry point and a reproducible action sequence before it is reported as a bug.
+- Verify the behavior through the normal product entry point whenever the environment supports it. Record the route, user state, actions, observed result, and evidence.
+- If no user-accessible trigger can be established, do not report the issue as a bug or assign a severity level. Record it separately as an unverified code risk only when it could affect future behavior or become reachable through a plausible product flow.
+- Do not infer user reachability from a static state transition, an internal prop change, or a theoretical component lifecycle. Confirm that the relevant component lifecycle can occur through ordinary user actions.
+- Every finding must include Trigger, Reproduction, Observed impact, and Evidence. Findings missing any of these fields must remain unconfirmed and must not appear in the bug findings list.
 - Report what was verified, what could not be checked, and any remaining limitations. Do not claim success beyond the available evidence.
 
 ## Image Data Mocking
