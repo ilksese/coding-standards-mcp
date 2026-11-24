@@ -50,6 +50,22 @@
 - Describe the latest implemented codebase in the present tense. Replace or remove stale descriptions, paths, and references instead of appending correction notes.
 - Documentation must not retain or introduce obsolete logic, migration narratives, or intermediate implementation states. Keep descriptions consistent across documents and verify referenced paths and symbols against the current code.
 
+## Documentation Rules & Progressive Disclosure
+
+1. **Boundary Enforcement**:
+   - `README.md` is strictly for end-users and product overview (what it is, quickstart, basic usage). Never put internal architecture notes, implementation details, or agent instructions there.
+   - `AGENTS.md` is strictly a concise routing map and hard-constraint index for AI agents. Keep it brief; do not dump full feature specs or long troubleshooting logs here.
+   - Put detailed feature docs, workflows, schemas, and troubleshooting guides under `docs/` as separate Markdown files (`docs/<feature-or-topic>.md`), split by independent, low-coupling capabilities.
+
+2. **Progressive Disclosure (Read on Demand)**:
+   - Do not load all files in `docs/` upfront. Only read the specific `docs/*.md` file relevant to the current task.
+   - When a new independent feature or subsystem is introduced, create a dedicated `docs/<name>.md` file instead of appending to `README.md` or `AGENTS.md`, and add a one-line entry in the Docs Index below.
+
+3. **Docs Index (Load Only When Needed)**:
+   - `docs/architecture.md`: System layout and cross-module boundaries.
+   - `docs/testing.md`: Test commands, fixtures, and verification workflow.
+   - `docs/<feature>.md`: Specific feature behavior, edge cases, and contracts.
+
 ## Goal-Driven Execution
 
 - When the user says only “收尾”, perform requirement closeout: verify acceptance criteria and ticket completion, synchronize maintained documentation, review whether ADRs remain valid, archive completed local specs and tickets, and repair affected references. Retain valid ADRs and keep specs and plans out of Git.
