@@ -1,5 +1,20 @@
 # Seamaid Web Family Standards (Between Global and Project Standards)
 
+## Technology Stack
+
+- Use Next.js 15, React 19, and TypeScript.
+- Style UI with Tailwind CSS v3 utility classes. Do not upgrade to Tailwind CSS v4 or introduce another styling system.
+- Do not use CSS Modules. Do not add or import `*.module.css` or `*.module.scss` files, and do not enable `cssModules`.
+
+## Browser Compatibility
+
+- The lowest browser version the product must support is Chrome 88.
+- Do not use a DOM API, Browser API, or CSS feature that Chrome 88 does not support. This includes a property, method, event, selector, at-rule, function, or value that exists only in a later Chrome version.
+- TypeScript types, a newer TypeScript `lib`, MDN, Baseline, or the Chrome version installed on the current machine do not raise this floor. If Chrome 88 support is uncertain, do not use the API or CSS feature.
+- A Tailwind CSS v3 utility, arbitrary value, or arbitrary property is allowed only when the CSS it emits is supported in Chrome 88.
+- Do not add a polyfill, ponyfill, or PostCSS plugin to make an unsupported DOM API, Browser API, or CSS feature available.
+- This ban does not forbid JavaScript syntax that the project's existing compiler already downlevels. That syntax transform is not permission to call an unsupported runtime API or to emit unsupported CSS.
+
 ## UI Copy Precedence
 
 - When UI copy in Figma designs conflicts with the product requirements document (PRD), use the copy from the PRD.
@@ -44,7 +59,7 @@
 
 - Use playwright-cli for regression testing.
 - Use a mobile `User-Agent` by default for regression testing.
-- The lowest browser version the product must support is Chrome 88. That floor is a compatibility requirement, not a browser build to install for the test run.
+- The lowest browser version the product must support is Chrome 88, as defined in Browser Compatibility. That floor is a compatibility requirement, not a browser build to install for the test run.
 - When using playwright-cli, do not download any additional browser version. Do not install Playwright's bundled Chromium, Chrome 88, or any other browser build, and do not run browser install commands such as `playwright install`.
 - Launch the Chrome already installed on the system, for example `playwright-cli open --browser=chrome`, or a local playwright-cli config whose `browser.launchOptions.channel` is `chrome`. Do not use `--browser=chromium`.
 - If system Chrome is not installed, stop and ask the user. Do not install a browser in order to continue.
