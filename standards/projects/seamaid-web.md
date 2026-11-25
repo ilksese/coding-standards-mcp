@@ -44,3 +44,7 @@
 
 - Use playwright-cli for regression testing.
 - Use a mobile `User-Agent` by default for regression testing.
+- The lowest browser version the product must support is Chrome 88. That floor is a compatibility requirement, not a browser build to install for the test run.
+- When using playwright-cli, do not download any additional browser version. Do not install Playwright's bundled Chromium, Chrome 88, or any other browser build, and do not run browser install commands such as `playwright install`.
+- Launch the Chrome already installed on the system, for example `playwright-cli open --browser=chrome`, or a local playwright-cli config whose `browser.launchOptions.channel` is `chrome`. Do not use `--browser=chromium`.
+- If system Chrome is not installed, stop and ask the user. Do not install a browser in order to continue.
